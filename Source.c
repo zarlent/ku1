@@ -16,13 +16,13 @@ int main() {
     double x, a, b, step, y;
 
     do {
-        printf("\n=== Меню ===\n");
-        printf("1. Значение в точке\n");
-        printf("2. Таблица значений\n");
-        printf("3. Минимум и максимум на отрезке\n");
-        printf("4. Найти x по Y\n");
-        printf("5. Вторая производная\n");
-        printf("0. Выход\n> ");
+        printf("\n=== РњРµРЅСЋ ===\n");
+        printf("1. Р—РЅР°С‡РµРЅРёРµ РІ С‚РѕС‡РєРµ\n");
+        printf("2. РўР°Р±Р»РёС†Р° Р·РЅР°С‡РµРЅРёР№\n");
+        printf("3. РњРёРЅРёРјСѓРј Рё РјР°РєСЃРёРјСѓРј РЅР° РѕС‚СЂРµР·РєРµ\n");
+        printf("4. РќР°Р№С‚Рё x РїРѕ Y\n");
+        printf("5. РџСЂРѕРёР·РІРѕРґРЅР°СЏ\n");
+        printf("0. Р’С‹С…РѕРґ\n> ");
         scanf("%d", &choice);
 
         switch (choice) {
@@ -120,6 +120,7 @@ void minmax(double a, double b, double step) {
         if (v > maxv) { maxv = v; maxx = t; }
     }
 
-    printf("\nМинимум: f(%.5f) = %.6f\n", minx, minv);
-    printf("Максимум: f(%.5f) = %.6f\n", maxx, maxv);
+    printf("\nРњРёРЅРёРјСѓРј: f(%.5f) = %.6f\n", minx, minv);
+    printf("РњР°РєСЃРёРјСѓРј: f(%.5f) = %.6f\n", maxx, maxv);
 }
+
