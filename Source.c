@@ -23,7 +23,7 @@ int main() {
         printf("2. Таблица значений\n");
         printf("3. Минимум или максимум на отрезке\n");
         printf("4. Найти x по Y\n");
-        printf("5. Вторая производная\n");
+        printf("5. Производная\n");
         printf("0. Выход\n> ");
         scanf("%d", &choice);
 
@@ -145,3 +145,4 @@ void minmax(double a, double b, double step,
         if (v > *maxv) { *maxv = v; *maxx = t; }
     }
 }
+
