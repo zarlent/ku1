@@ -8,8 +8,9 @@ double solve(double y, double a, double b, double eps);
 double der2(double x);
 void table(double a, double b, double step);
 void minmax(double a, double b, double step,
-            double* minx, double* minv,
-            double* maxx, double* maxv);
+    double* minx, double* minv,
+    double* maxx, double* maxv);
+void save_table_to_file(double a, double b, double step);
 
 int main() {
     setlocale(LC_ALL, "RUS");
@@ -23,7 +24,8 @@ int main() {
         printf("2. Таблица значений\n");
         printf("3. Минимум или максимум на отрезке\n");
         printf("4. Найти x по Y\n");
-        printf("5. Производная\n");
+        printf("5. Вторая производная\n");
+        printf("6. Сохранить таблицу в файл\n");
         printf("0. Выход\n> ");
         scanf("%d", &choice);
 
@@ -88,6 +90,22 @@ int main() {
             scanf("%lf", &x);
             printf("f''(%.4f) = %.6f\n", x, der2(x));
             break;
+
+        case 6:
+            printf("a = ");
+            scanf("%lf", &a);
+            printf("b = ");
+            scanf("%lf", &b);
+            printf("step = ");
+            scanf("%lf", &step);
+
+            if (step <= 0) {
+                printf("Ошибка: шаг должен быть положительным\n");
+                break;
+            }
+
+            save_table_to_file(a, b, step);
+            break;
         }
 
     } while (choice != 0);
@@ -102,7 +120,7 @@ double f(double x) {
         return cos(3 * x) / pow(1 + x * x, 0.2);
     else
         return log(x * x + 2 * x + 2) *
-               (4 * x * x * x - x * x + 3 * x - 2);
+        (4 * x * x * x - x * x + 3 * x - 2);
 }
 
 double solve(double y, double a, double b, double eps) {
@@ -131,8 +149,8 @@ void table(double a, double b, double step) {
 }
 
 void minmax(double a, double b, double step,
-            double* minx, double* minv,
-            double* maxx, double* maxv) {
+    double* minx, double* minv,
+    double* maxx, double* maxv) {
 
     *minx = a;
     *maxx = a;
@@ -146,3 +164,26 @@ void minmax(double a, double b, double step,
     }
 }
 
+void save_table_to_file(double a, double b, double step) {
+    char filename[100];
+    printf("Введите имя файла (например table.txt): ");
+    scanf("%s", filename);
+
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Ошибка открытия файла\n");
+        return;
+    }
+
+    fprintf(file, "----------------------------------------\n");
+    fprintf(file, "|      x       |        f(x)           |\n");
+    fprintf(file, "----------------------------------------\n");
+
+    for (double x = a; x <= b; x += step)
+        fprintf(file, "| %12.5f | %21.6f |\n", x, f(x));
+
+    fprintf(file, "----------------------------------------\n");
+
+    fclose(file);
+    printf("Таблица сохранена в файл \"%s\"\n", filename);
+}
