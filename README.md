@@ -24,31 +24,17 @@
 
 ## 📁 Структура проекта
 
-├── .gitattributes
+├── README.md
 
-├── .gitignore
+├── Source.c
 
-├── main_file.c
+├── functions.png
 
-├── func.h
+├── grafik1.png
 
-├── func.c
+├── grafik2.png
 
-├── Kursovaya_Rabota_1.sln
-
-├── Kursovaya_Rabota_1.vcxproj
-
-├── Kursovaya_Rabota_1.vcxproj.filters
-
-├── funci.png
-
-├── grafic1.png
-
-├── grafic2.png
-
-├── grafic3.png
-
-└── README.md
+└── grafik3.png
 
 
 ## 🔧 Реализованные функции и структуры
