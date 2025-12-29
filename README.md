@@ -1,6 +1,6 @@
 # Курсовая работа
 Цель данной работы - алгоритмизация и написание кода на языке СИ для табулирования кусочной функции f(x), использующую многоальтернативный выбор решения:
-<img width="480" height="166" alt="image" src="functions.png">
+<img width="580" height="200" alt="image" src="functions.png">
 
 ### График функции f(x) при x < -1
 <img width="600" height="700" alt="image" src="grafik1.png">
