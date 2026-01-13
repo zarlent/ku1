@@ -5,18 +5,20 @@
 
 double f(double x);
 double solve(double y, double a, double b, double eps);
-double der2(double x);
-void table(double a, double b, double step);
-void minmax(double a, double b, double step,
-    double* minx, double* minv,
-    double* maxx, double* maxv);
-void save_table_to_file(double a, double b, double step);
+double der2(double x, double eps);
+
+double find_min(double a, double b, double step);
+double find_max(double a, double b, double step);
+
+void print_table(double a, double b, double step, double eps, FILE* out);
+void table(double a, double b, double step, double eps);
+int save_table_to_file(double a, double b, double step, double eps);
 
 int main() {
     setlocale(LC_ALL, "RUS");
 
     int choice;
-    double x, a, b, step, y;
+    double x, a, b, step, y, eps;
 
     do {
         printf("\n=== Меню ===\n");
@@ -38,37 +40,23 @@ int main() {
             break;
 
         case 2:
-            printf("a = ");
-            scanf("%lf", &a);
-            printf("b = ");
-            scanf("%lf", &b);
-            printf("step = ");
-            scanf("%lf", &step);
-            table(a, b, step);
+            printf("a b step eps: ");
+            scanf("%lf %lf %lf %lf", &a, &b, &step, &eps);
+            table(a, b, step, eps);
             break;
 
         case 3: {
             int mm;
-            double minx, minv, maxx, maxv;
+            printf("a b step: ");
+            scanf("%lf %lf %lf", &a, &b, &step);
 
-            printf("a = ");
-            scanf("%lf", &a);
-            printf("b = ");
-            scanf("%lf", &b);
-            printf("step = ");
-            scanf("%lf", &step);
-
-            printf("Что вывести?\n");
-            printf("1 - Минимум\n");
-            printf("2 - Максимум\n> ");
+            printf("1 - Минимум\n2 - Максимум\n> ");
             scanf("%d", &mm);
 
-            minmax(a, b, step, &minx, &minv, &maxx, &maxv);
-
             if (mm == 1)
-                printf("\nМинимум: f(%.5f) = %.6f\n", minx, minv);
+                printf("Минимум = %.6f\n", find_min(a, b, step));
             else if (mm == 2)
-                printf("\nМаксимум: f(%.5f) = %.6f\n", maxx, maxv);
+                printf("Максимум = %.6f\n", find_max(a, b, step));
             else
                 printf("Неверный выбор\n");
 
@@ -76,35 +64,23 @@ int main() {
         }
 
         case 4:
-            printf("Y = ");
-            scanf("%lf", &y);
-            printf("a = ");
-            scanf("%lf", &a);
-            printf("b = ");
-            scanf("%lf", &b);
-            printf("x ~= %.6f\n", solve(y, a, b, 1e-6));
+            printf("Y a b eps: ");
+            scanf("%lf %lf %lf %lf", &y, &a, &b, &eps);
+            printf("x ~= %.6f\n", solve(y, a, b, eps));
             break;
 
         case 5:
-            printf("x = ");
-            scanf("%lf", &x);
-            printf("f''(%.4f) = %.6f\n", x, der2(x));
+            printf("x eps: ");
+            scanf("%lf %lf", &x, &eps);
+            printf("f''(%.4f) = %.6f\n", x, der2(x, eps));
             break;
 
         case 6:
-            printf("a = ");
-            scanf("%lf", &a);
-            printf("b = ");
-            scanf("%lf", &b);
-            printf("step = ");
-            scanf("%lf", &step);
+            printf("a b step eps: ");
+            scanf("%lf %lf %lf %lf", &a, &b, &step, &eps);
 
-            if (step <= 0) {
-                printf("Ошибка: шаг должен быть положительным\n");
-                break;
-            }
-
-            save_table_to_file(a, b, step);
+            if (save_table_to_file(a, b, step, eps) < 0)
+                printf("Ошибка записи в файл\n");
             break;
         }
 
@@ -116,7 +92,7 @@ int main() {
 double f(double x) {
     if (x < -1)
         return (log(1 + x) - x) / (x * x);
-    else if (x >= -1 && x < 4)
+    else if (x < 4)
         return cos(3 * x) / pow(1 + x * x, 0.2);
     else
         return log(x * x + 2 * x + 2) *
@@ -132,58 +108,52 @@ double solve(double y, double a, double b, double eps) {
     return (a + b) / 2;
 }
 
-double der2(double x) {
-    double h = 1e-5;
-    return (f(x + h) - 2 * f(x) + f(x - h)) / (h * h);
+double der2(double x, double eps) {
+    return (f(x + eps) - 2 * f(x) + f(x - eps)) / (eps * eps);
 }
 
-void table(double a, double b, double step) {
-    printf("\n----------------------------------------\n");
-    printf("|      x       |        f(x)           |\n");
-    printf("----------------------------------------\n");
 
-    for (double t = a; t <= b; t += step)
-        printf("| %12.5f | %21.6f |\n", t, f(t));
-
-    printf("----------------------------------------\n");
+double find_min(double a, double b, double step) {
+    double minv = f(a);
+    for (double x = a; x <= b; x += step)
+        if (f(x) < minv) minv = f(x);
+    return minv;
 }
 
-void minmax(double a, double b, double step,
-    double* minx, double* minv,
-    double* maxx, double* maxv) {
-
-    *minx = a;
-    *maxx = a;
-    *minv = f(a);
-    *maxv = f(a);
-
-    for (double t = a; t <= b; t += step) {
-        double v = f(t);
-        if (v < *minv) { *minv = v; *minx = t; }
-        if (v > *maxv) { *maxv = v; *maxx = t; }
-    }
+double find_max(double a, double b, double step) {
+    double maxv = f(a);
+    for (double x = a; x <= b; x += step)
+        if (f(x) > maxv) maxv = f(x);
+    return maxv;
 }
 
-void save_table_to_file(double a, double b, double step) {
+void print_table(double a, double b, double step, double eps, FILE* out) {
+    fprintf(out, "----------------------------------------\n");
+    fprintf(out, "|      x       |        f(x)           |\n");
+    fprintf(out, "----------------------------------------\n");
+
+    for (double t = a; t <= b + eps; t += step)
+        fprintf(out, "| %12.5f | %21.6f |\n", t, f(t));
+
+    fprintf(out, "----------------------------------------\n");
+}
+
+void table(double a, double b, double step, double eps) {
+    print_table(a, b, step, eps, stdout);
+}
+
+int save_table_to_file(double a, double b, double step, double eps) {
     char filename[100];
-    printf("Введите имя файла (например table.txt): ");
+    printf("Имя файла: ");
     scanf("%s", filename);
 
     FILE* file = fopen(filename, "w");
-    if (file == NULL) {
-        printf("Ошибка открытия файла\n");
-        return;
+    if (!file) {
+        return -1; 
     }
-
-    fprintf(file, "----------------------------------------\n");
-    fprintf(file, "|      x       |        f(x)           |\n");
-    fprintf(file, "----------------------------------------\n");
-
-    for (double x = a; x <= b; x += step)
-        fprintf(file, "| %12.5f | %21.6f |\n", x, f(x));
-
-    fprintf(file, "----------------------------------------\n");
-
+    print_table(a, b, step, eps, file);
     fclose(file);
-    printf("Таблица сохранена в файл \"%s\"\n", filename);
+
+    printf("Таблица сохранена в \"%s\"\n", filename);
+    return 1;  
 }
